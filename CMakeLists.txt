@@ -4,19 +4,19 @@ include_directories(galib)
 
 add_executable(pngwolf
 pngwolf.cxx
-galib/ga/GA1DArrayGenome.C
-galib/ga/GAAllele.C
-galib/ga/GABaseGA.C
-galib/ga/gabincvt.C
-galib/ga/GAGenome.C
-galib/ga/GAIncGA.C
-galib/ga/GAParameter.C
-galib/ga/GAPopulation.C
-galib/ga/garandom.C
-galib/ga/gaerror.C
-galib/ga/GAScaling.C
-galib/ga/GASelector.C
-galib/ga/GAStatistics.C
+galib/GA1DArrayGenome.C
+galib/GAAllele.C
+galib/GABaseGA.C
+galib/gabincvt.C
+galib/GAGenome.C
+galib/GAIncGA.C
+galib/GAParameter.C
+galib/GAPopulation.C
+galib/garandom.C
+galib/gaerror.C
+galib/GAScaling.C
+galib/GASelector.C
+galib/GAStatistics.C
 )
 find_package( ZLIB REQUIRED )
 if ( ZLIB_FOUND )

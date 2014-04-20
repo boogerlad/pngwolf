@@ -1,33 +1,48 @@
 # -*- Mode: makefile -*-
-# Makefile to build GAlib with Borland tools
-# Copyright (c) 1996-2005 Matthew Wall, all rights reserved
+# Copyright (c) 1994-1996 Massachusetts Institute of Technology
+# Copyright (c) 1996-2005 Matthew Wall
+# -----------------------------------------------------------------------------
 
-all: lib ex
+!include ../makevars.bcc
+!include makefile.sources
 
-lib:
-	cd ga
-	make -f makefile.bcc
-	cd ..
+CXXFLAGS = $(CXXFLAGS) -I..
 
-ex:
-	cd examples
-	make -f makefile.bcc
-	cd ..
+STATIC = $(LIB_NAME)
+LIB    = $(STATIC).lib
 
-test:
-	cd examples
-	make -f makefile.bcc test
-	cd ..
+all: $(LIB)
+
+# this really sucks, but i have not yet found documentation about the borland
+# make or link that will let me avoid the for loop.
+$(LIB): $(OBJS) 
+	@for %i in ( $(OBJS) ) do \
+          $(AR) $(ARFLAGS) $(LIB) +%i
+	@echo $(LIB_NAME) is now up-to-date
+
+install: install.lib install.hdr
+	@echo installation complete
+
+install.lib: $(LIB) lib_directories
+	$(INSTALL) $(LIB) $(LIB_DEST_DIR)
+
+install.hdr: hdr_directories
+	@for %i in ( $(HDRS) ) do \
+          $(CP) /Q %i $(HDR_DEST_DIR)\$(LIB_NAME)
+	@for %i in ( $(TMPL_SRCS) ) do \
+          $(CP) /Q %i $(HDR_DEST_DIR)\$(LIB_NAME)
+
+lib_directories:
+	@if not exist $(LIB_DEST_DIR) \
+          $(MKDIR) $(LIB_DEST_DIR)
+hdr_directories:
+	@if not exist $(HDR_DEST_DIR)\$(LIB_NAME) \
+          $(MKDIR) $(HDR_DEST_DIR)\$(LIB_NAME)
+
+remove:
+	$(RM) $(LIB_DEST_DIR)\$(LIB)
+	$(RM) $(HDR_DEST_DIR)\$(LIB_NAME)
 
 clean:
-	cd ga
-	make -f makefile.bcc clean
-	cd ..
-	cd examples
-	make -f makefile.bcc clean
-	cd ..
-
-install:
-	cd ga
-	make -f makefile.bcc install
-	cd ..
+	$(RM) *.obj *.o *.tds
+	$(RM) $(LIB_NAME).lib

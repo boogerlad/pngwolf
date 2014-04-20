@@ -1,46 +1,39 @@
 # -*- Mode: makefile -*-
-# Makefile for GAlib
-# Copyright (c) 1996-2005 Matthew Wall, all rights reserved
-#
-# If you need to customize the build of galib, you should first modify the
-# variables in the makevars file.
+# Copyright (c) 1994-1996 Massachusetts Institute of Technology
+# Copyright (c) 1996-2005 Matthew Wall
+# -----------------------------------------------------------------------------
 
-GALIB_VERSION=2.4.7
-GALIB_VER=247
-TMPDIR=/var/tmp
-RELDIR=$(TMPDIR)/galib$(GALIB_VER)
+include ../makevars
+include makefile.sources
 
-all: lib ex
+INC_DIRS= -I..
 
-lib:
-	cd ga; $(MAKE)
+.SUFFIXES: .C
+.C.o:
+	$(CXX) $(CXXFLAGS) $(INC_DIRS) -c $<
 
-ex:
-	cd examples; $(MAKE)
-
-test: lib ex
-	cd examples; $(MAKE) test
-
-install:
-	cd ga; $(MAKE) install
-
-uninstall:
-	cd ga; $(MAKE) uninstall
+$(LIB): $(OBJS) 
+	$(PRELINK)
+	$(AR) $(LIB) $?
+	$(RANLIB) $(LIB)
+	echo "$(CXX) $(CXXFLAGS)" > BUILD
+	@echo $(LIB) is now up-to-date
+.C.a:;
 
 clean:
-	cd ga; $(MAKE) clean
-	cd examples; $(MAKE) clean
+	$(RM) $(LIB) BUILD
+	$(RM) *.o *~ .#* *.bak core ii_files ptrepository
 
-release: clean 
-	rm -rf $(RELDIR)
-	mkdir -p $(RELDIR)
-	cp -rp * $(RELDIR)
-	rm -rf `find $(RELDIR) -name CVS`
-	rm -rf `find $(RELDIR) -name .svn`
-	rm -f `find $(RELDIR) -name "*~"`
-	echo $(GALIB_VERSION) > $(RELDIR)/VERSION
-	perl -pi -e 's/evision: \d+\.\d+ /evision: $(GALIB_VERSION) /' $(RELDIR)/ga/gaversion.h
-	perl -pi -e 'chop($$dt=`date +"%Y/%m/%d %H:%M:%S"`); s/Date: ..\/..\/.. ..:..:.. /Date: $$dt /' $(RELDIR)/ga/gaversion.h
-	cd $(RELDIR)/..; tar cvfz galib$(GALIB_VER).tgz galib$(GALIB_VER) > $(TMPDIR)/galib$(GALIB_VER)-manifest-tar.txt
-	cd $(RELDIR)/..; zip -r galib$(GALIB_VER).zip galib$(GALIB_VER) > $(TMPDIR)/galib$(GALIB_VER)-manifest-zip.txt
-	@echo "  GAlib $(GALIB_VERSION) has been released to $(TMPDIR)"
+install:: $(LIB)
+	$(INSTALL) $(LIB) $(LIB_DEST_DIR)
+	$(RM) $(HDR_DEST_DIR)/ga; $(MKDIR) $(HDR_DEST_DIR)/ga
+	$(CP) $(HDRS) $(TMPL_SRCS) ../VERSION BUILD $(HDR_DEST_DIR)/ga
+
+uninstall:
+	$(RM) $(LIB_DEST_DIR)/$(LIB)
+	$(RM) $(HDR_DEST_DIR)/ga
+
+depend:
+	$(MKDEPEND) $(INC_DIRS) $(SRCS)
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.

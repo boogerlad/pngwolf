@@ -143,7 +143,6 @@ public:
 
   //
   Deflater* deflate_fast;
-  Deflater* deflate_good;
 
   // User input
   bool should_abort;
@@ -200,8 +199,7 @@ public:
     nth_generation(0),
     genomes_evaluated(0),
     done_deflating_at(0),
-    deflate_fast(NULL),
-    deflate_good(NULL)
+    deflate_fast(NULL)
   {}
 
   ~PngWolf() {
@@ -1170,22 +1168,7 @@ after_while:
 
 void PngWolf::recompress() {
   best_inflated = refilter(*best_genomes.back());
-  best_deflated = deflate_good->deflate(best_inflated);
-
-  // In my test sample in 1.66% of cases, using a high zlib level,
-  // zlib is able to produce smaller output than 7-Zip. So for the
-  // case where users do choose a high setting for zlib, reward
-  // them by using zlib instead to recompress. Since zlib is fast,
-  // this recompression should not be much of a performance hit.
-
-  // TODO: This should be noted in the verbose output, otherwise
-  // this would make 7zip appear better than it is. In the longer
-  // term perhaps the output should simply say what estimator and
-  // what compressor was used and give the respective sizes.
-
-  if (best_deflated.size() > best_genomes.back()->score()) {
-    best_deflated = deflate_fast->deflate(best_inflated);
-  }
+  best_deflated = deflate_fast->deflate(best_inflated);
 
   // TODO: Doing this here is a bit of an hack, and doing it
   // should also be logged in the verbose output. Main problem

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.7)
 
-include_directories(zlib galib)
+include_directories(galib)
 
 add_executable(pngwolf
 pngwolf.cxx
@@ -17,19 +17,9 @@ galib/ga/gaerror.C
 galib/ga/GAScaling.C
 galib/ga/GASelector.C
 galib/ga/GAStatistics.C
-zlib/adler32.c
-zlib/compress.c
-zlib/crc32.c
-zlib/deflate.c
-zlib/gzclose.c
-zlib/gzlib.c
-zlib/gzread.c
-zlib/gzwrite.c
-zlib/infback.c
-zlib/inffast.c
-zlib/inflate.c
-zlib/inftrees.c
-zlib/trees.c
-zlib/uncompr.c
-zlib/zutil.c
 )
+find_package( ZLIB REQUIRED )
+if ( ZLIB_FOUND )
+    include_directories( ${ZLIB_INCLUDE_DIRS} )
+    target_link_libraries( pngwolf ${ZLIB_LIBRARIES} )
+endif( ZLIB_FOUND )

@@ -21,7 +21,7 @@ char _gaerrbuf2[120];
 static STD_OSTREAM *__gaErrStream = & STD_CERR;
 #endif
 static GABoolean __gaErrFlag = gaTrue;
-static char *__gaErrStr[] = {
+static const char *__gaErrStr[] = {
   "error reading from file: ",
   "error writing to file: ",
   "unexpected EOF encountered during read.",
@@ -68,10 +68,10 @@ static char *__gaErrStr[] = {
   "node relative to which insertion is made must be non-NULL.",
   "root node must have no siblings.  insertion aborted.",
   "cannot insert before a root node (only below).",
-  "cannot insert after a root node (only below)."  
+  "cannot insert after a root node (only below)."
 };
 
-void 
+void
 GAErr(const GASourceLocator loc, const char *clss, const char *func,
       const char *msg1, const char *msg2, const char *msg3){
   gaErrMsg[0] = '\0';
@@ -98,7 +98,7 @@ GAErr(const GASourceLocator loc, const char *clss, const char *func,
 #endif
 }
 
-void 
+void
 GAErr(const GASourceLocator loc, const char *clss, const char *func,
       GAErrorIndex i, const char *msg2, const char *msg3){
   gaErrMsg[0] = '\0';
@@ -125,8 +125,8 @@ GAErr(const GASourceLocator loc, const char *clss, const char *func,
 #endif
 }
 
-void 
-GAErr(const GASourceLocator loc, const char *func, 
+void
+GAErr(const GASourceLocator loc, const char *func,
       GAErrorIndex i, const char *msg2, const char *msg3){
   gaErrMsg[0] = '\0';
   strcat(gaErrMsg, func);

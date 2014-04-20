@@ -75,25 +75,8 @@ optimizations at well-specified points (such as the total time used),
 and if you start an optimization run but grow impatient and abort the
 program, results should not get lost, but should be stored anyway.
 
-To compile `pngwolf` you need three additional libraries:
-
-  * GAlib http://lancet.mit.edu/ga/dist/
-  * 7-Zip http://www.7-zip.org/download.html ("7-Zip Source code")
-  * zlib  http://zlib.net/
-
-Put these into `galib`, `7zip`, and `zlib` sub-directories into the
-directory where pngwolf.cxx is located, and then either use the CMake
-utility (http://www.cmake.org/) on the `CMakeLists.txt`, or simply
-specify all the files specified in `CMakeLists.txt` as input to your
-compiler. The latter would look like:
-
-  % gcc -I7zip/CPP -Igalib pngwolf.cxx galib/ga/GA1DArrayGenome.C 
-      galib/ga/GAAllele.C ... -lstdc++ -o pngwolf
-
-If you are using 7-Zip 9.20 there are two bugs in 7-Zip that prevent
-gcc building https://sourceforge.net/support/tracker.php?aid=3200655
-it. To address that, apply the patch `sevenzip920.patch` like so:
-
-  % patch -p 0 < sevenzip920.patch
-
-I've done this successfully with Visual C++ 2010 and Cygwin gcc 4.3.4.
+To compile on linux,
+```
+cmake CMakeLists.txt
+make
+```

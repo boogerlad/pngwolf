@@ -28,7 +28,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <ga/ga.h>
+#include <ga.h>
 #include <iostream>
 #include <list>
 #include <vector>

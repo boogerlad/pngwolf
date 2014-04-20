@@ -25,14 +25,6 @@
 #include <arpa/inet.h>
 #endif
 
-#include "Common/MyWindows.h"
-#include "Common/MyInitGuid.h"
-#include "7zip/IStream.h"
-#include "7zip/Compress/ZlibEncoder.h"
-#include "7zip/Common/FileStreams.h"
-#include "7zip/Common/InBuffer.h"
-#include "7zip/Common/StreamObjects.h"
-
 #include <signal.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -148,9 +140,6 @@ public:
   int zlib_windowBits;
   int zlib_memLevel;
   int zlib_strategy;
-  int szip_pass;
-  int szip_fast;
-  int szip_cycl;
 
   //
   Deflater* deflate_fast;
@@ -171,7 +160,7 @@ public:
   std::vector<char> original_deflated;
   std::vector<char> original_unfiltered;
 
-  // 
+  //
   std::map<PngFilter, std::vector<char> > flt_singles;
 
   //
@@ -264,75 +253,6 @@ public:
   z_stream strm;
 };
 
-struct Deflate7zip : public Deflater {
-public:
-  std::vector<char> deflate(const std::vector<char>& inflated) {
-
-    NCompress::NZlib::CEncoder c;
-    PROPID algoProp = NCoderPropID::kAlgorithm;
-    PROPID passProp = NCoderPropID::kNumPasses;
-    PROPID fastProp = NCoderPropID::kNumFastBytes;
-    PROPID cyclProp = NCoderPropID::kMatchFinderCycles;
-
-    PROPVARIANT v;
-    v.vt = VT_UI4;
-
-    // TODO: figure out what to do with errors here
-
-    c.Create();
-
-    NCompress::NDeflate::NEncoder::CCOMCoder* d = 
-      c.DeflateEncoderSpec;
-
-    v.ulVal = szip_algo;
-    if (d->SetCoderProperties(&algoProp, &v, 1) != S_OK) {
-    }
-
-    v.ulVal = szip_pass;
-    if (d->SetCoderProperties(&passProp, &v, 1) != S_OK) {
-    }
-
-    v.ulVal = szip_fast;
-    if (d->SetCoderProperties(&fastProp, &v, 1) != S_OK) {
-    }
-
-    v.ulVal = szip_cycl;
-    if (d->SetCoderProperties(&cyclProp, &v, 1) != S_OK) {
-    }
-
-    CBufInStream* in_buf = new CBufInStream;
-
-    // TODO: find a way to use a a fixed buffer since we know
-    // the maximum size for it and don't use more than one. It
-    // might also be a good idea to keep the other objects for
-    // all the passes through this to avoid re-allocations and
-    // the possible failures that might go along with them.
-    CDynBufSeqOutStream* out_buf = new CDynBufSeqOutStream;
-    in_buf->Init((const Byte*)&inflated[0], inflated.size());
-    CMyComPtr<ISequentialInStream> in(in_buf);
-    CMyComPtr<ISequentialOutStream> out(out_buf);
-
-    if (c.Code(in, out, NULL, NULL, NULL) != S_OK) {
-    }
-
-    std::vector<char> deflated(out_buf->GetSize());
-    memcpy(&deflated[0], out_buf->GetBuffer(), deflated.size());
-
-    return deflated;
-  }
-
-  Deflate7zip(int pass, int fast, int cycl) :
-    szip_pass(pass),
-    szip_fast(fast),
-    szip_cycl(cycl),
-    szip_algo(1) {
-  }
-
-  int szip_pass;
-  int szip_fast;
-  int szip_cycl;
-  int szip_algo;
-};
 
 static const char PNG_MAGIC[] = "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A";
 static const uint32_t IDAT_TYPE = 0x49444154;
@@ -412,7 +332,7 @@ void filter_row_avg(unsigned char* src, unsigned char* dst, size_t row, size_t p
 
   for (; xix < row * bytes + 1 + pwidth; ++xix, ++bix)
     dst[xix] = src[xix] - (src[bix] >> 1);
-  
+
   for (; xix < end; ++xix, ++aix, ++bix)
     dst[xix] = src[xix] - ((src[aix] + src[bix]) >> 1);
 }
@@ -437,7 +357,7 @@ void filter_row_paeth(unsigned char* src, unsigned char* dst, size_t row, size_t
   // TODO: this should not change pwidth
   for (; pwidth > 0; --pwidth, ++xix, ++bix)
     dst[xix] = src[xix] - paeth_predictor(0, src[bix] , 0);
-  
+
   for (; xix < end; ++xix, ++aix, ++bix, ++cix)
     dst[xix] = src[xix] - paeth_predictor(src[aix], src[bix], src[cix]);
 }
@@ -480,7 +400,7 @@ void unfilter_row_avg(unsigned char* idat, size_t row, size_t pwidth, size_t byt
   aix = xix;
   for (; pwidth > 0; --pwidth)
     idat[xix++] += idat[bix++] >> 1;
-  
+
   while (xix < end)
     idat[xix++] += (idat[aix++] + idat[bix++]) >> 1;
 }
@@ -504,7 +424,7 @@ void unfilter_row_paeth(unsigned char* idat, size_t row, size_t pwidth, size_t b
 
   for (; pwidth > 0; --pwidth)
     idat[xix++] += paeth_predictor(0, idat[bix++] , 0);
-  
+
   while (xix < end)
     idat[xix++] += paeth_predictor(idat[aix++], idat[bix++] , idat[cix++]);
 }
@@ -701,7 +621,6 @@ void PngWolf::log_summary() {
       "best zlib deflated idat size: %0.0f\n"
       "total time spent optimizing:  %0.0f\n"
       "number of genomes evaluated:  %u\n"
-      "size of 7zip deflated data:   %u\n"
       "size difference to original:  %d\n",
       best_genomes.back()->score(),
       difftime(time(NULL), program_begun_at),
@@ -831,7 +750,7 @@ void PngWolf::log_analysis() {
 
 void PngWolf::log_critter(PngFilterGenome* curr_best) {
   PngFilterGenome* prev_best = best_genomes.back();
-  
+
   if (!this->verbose_genomes) {
     fprintf(stdout, ""
       "- zlib deflated idat size: %7u # %+5d bytes %+4.0f seconds\n",
@@ -918,7 +837,7 @@ void PngWolf::init_filters() {
     // filters, and select the filter that gives the smallest
     // sum of absolute values of outputs. (Consider the output
     // bytes as signed differences for this test.) This method
-    // usually outperforms any single fixed filter choice." as 
+    // usually outperforms any single fixed filter choice." as
     // per <http://www.w3.org/TR/PNG/#12Filter-selection>.
 
     // Note that I've found this to be incorrect, as far as
@@ -1459,18 +1378,6 @@ bool PngWolf::read_file() {
     }
   }
 
-  // For very large images the highest 7-Zip setting requires too
-  // much time to be worth the saved bytes, especially as `pngout`
-  // performs better for such images, at least if they are highly
-  // redundant, anyway, so this option allows picking the highest
-  // setting for small images while not requiring users to wait a
-  // very long time for the compressed result. TODO: maybe the
-  // base value should configurable.
-  if (auto_mpass) {
-    double times = double(original_inflated.size()) / (64*1024.f);
-    szip_pass = 16 - std::max(1, int(floor(times)));
-  }
-
   return false;
 
 error:
@@ -1633,9 +1540,6 @@ help(void) {
     "  --zlib-strategy=<int>          zlib estimator strategy (default: 0)         \n"
     "  --zlib-window=<int>            zlib estimator window bits (default: 15)     \n"
     "  --zlib-memlevel=<int>          zlib estimator memory level (default: 8)     \n"
-    "  --7zip-mfb=<int>               7zip fast bytes 3..258 (default: 258)        \n"
-    "  --7zip-mpass=<int|auto>        7zip passes 0..15 (d: 2; > ~ slower, smaller)\n"
-    "  --7zip-mmc=<int>               7zip match finder cycles (d: 258)            \n"
     "  --verbose-analysis             More details in initial image analysis       \n"
     "  --verbose-summary              More details in optimization summary         \n"
     "  --verbose-genomes              More details when improvements are found     \n"
@@ -1702,9 +1606,6 @@ main(int argc, char *argv[]) {
   int argZlibStrategy = 0;
   int argZlibMemlevel = 8;
   int argZlibWindow = 15;
-  int arg7zipFastBytes = 258;
-  int arg7zipPasses = 2;
-  int arg7zipCycles = 258;
 
   bool argOkay = true;;
 
@@ -1839,23 +1740,6 @@ main(int argc, char *argv[]) {
               || argZlibStrategy == Z_HUFFMAN_ONLY
               || argZlibStrategy == Z_RLE;
 
-    } else if (strncmp("--7zip-mfb", s, nlen) == 0) {
-      arg7zipFastBytes = atoi(value);
-      argOkay &= arg7zipFastBytes >= 3;
-      argOkay &= arg7zipFastBytes <= 258;
-
-    } else if (strncmp("--7zip-mpass", s, nlen) == 0) {
-      if (strcmp(value, "auto") == 0) {
-        argAutoMpass = true;
-      } else {
-        arg7zipPasses = atoi(value);
-        argOkay &= arg7zipPasses >= 1;
-        argOkay &= arg7zipPasses <= 15;
-      }
-
-    } else if (strncmp("--7zip-mmc", s, nlen) == 0) {
-      arg7zipCycles = atoi(value);
-
     } else {
       // TODO: error
       argHelp = 1;
@@ -1868,17 +1752,12 @@ main(int argc, char *argv[]) {
   }
 
   DeflateZlib fast(argZlibLevel, argZlibWindow, argZlibMemlevel, argZlibStrategy);
-  Deflate7zip good(arg7zipPasses, arg7zipFastBytes, arg7zipCycles);
 
-  wolf.szip_cycl = arg7zipCycles;
-  wolf.szip_fast = arg7zipFastBytes;
-  wolf.szip_pass = arg7zipPasses;
   wolf.zlib_level = argZlibLevel;
   wolf.zlib_memLevel = argZlibMemlevel;
   wolf.zlib_strategy = argZlibStrategy;
   wolf.zlib_windowBits = argZlibWindow;
   wolf.deflate_fast = &fast;
-  wolf.deflate_good = &good;
   wolf.in_path = argPng;
   wolf.max_deflate = argMaxDeflate;
   wolf.max_evaluations = argMaxEvaluations;

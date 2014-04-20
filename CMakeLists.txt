@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.7)
 
-include_directories(zlib 7zip/CPP galib)
+include_directories(zlib galib)
 
 add_executable(pngwolf
 pngwolf.cxx
@@ -32,18 +32,4 @@ zlib/inftrees.c
 zlib/trees.c
 zlib/uncompr.c
 zlib/zutil.c
-7zip/CPP/7zip/Common/InBuffer.cpp
-7zip/CPP/7zip/Common/OutBuffer.cpp
-7zip/CPP/7zip/Common/StreamObjects.cpp
-7zip/CPP/7zip/Common/StreamUtils.cpp
-7zip/CPP/7zip/Compress/BitlDecoder.cpp
-7zip/CPP/7zip/Compress/DeflateDecoder.cpp
-7zip/CPP/7zip/Compress/DeflateEncoder.cpp
-7zip/CPP/7zip/Compress/LzOutWindow.cpp
-7zip/CPP/7zip/Compress/ZlibDecoder.cpp
-7zip/CPP/7zip/Compress/ZlibEncoder.cpp
-7zip/C/Alloc.c
-7zip/C/HuffEnc.c
-7zip/C/LzFind.c
-7zip/C/Sort.c
 )

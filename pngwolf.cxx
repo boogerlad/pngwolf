@@ -618,13 +618,11 @@ void PngWolf::log_summary() {
     fprintf(stdout, ""
       "best zlib deflated idat size: %0.0f\n"
       "total time spent optimizing:  %0.0f\n"
-      "number of genomes evaluated:  %u\n"
-      "size difference to original:  %d\n",
+      "number of genomes evaluated:  %u\n",
       best_genomes.back()->score(),
       difftime(time(NULL), program_begun_at),
-      genomes_evaluated,
-      best_deflated.size(),
-      -diff);
+      genomes_evaluated);
+    std::cout << "size difference to original:  " << best_deflated.size() << '\n'
   }
 
   if (diff >= 0)
@@ -638,9 +636,9 @@ void PngWolf::log_summary() {
 void PngWolf::log_analysis() {
 
   fprintf(stdout, "---\n"
-    "# %u x %u pixels at depth %u (mode %u) with IDAT %u bytes (%u deflated)\n",
-    ihdr.width, ihdr.height, ihdr.depth, ihdr.color,
-    original_inflated.size(), original_deflated.size());
+    "# %u x %u pixels at depth %u (mode %u) with IDAT ",
+    ihdr.width, ihdr.height, ihdr.depth, ihdr.color);
+  std::cout << original_inflated.size() << " bytes (" << original_deflated.size() << " deflated)\n"
 
   if (!verbose_analysis)
     return;
@@ -651,23 +649,16 @@ void PngWolf::log_analysis() {
     "height in pixels:   %u\n"
     "color mode:         %u\n"
     "color bit depth:    %u\n"
-    "interlaced:         %u\n"
-    "scanline width:     %u\n"
-    "scanline delta:     %u\n"
-    "inflated idat size: %u\n"
-    "deflated idat size: %u\n"
-    "chunks present:     ",
-    this->in_path,
-    this->ihdr.width,
-    this->ihdr.height,
-    this->ihdr.color,
-    this->ihdr.depth,
-    this->ihdr.interlace,
-    this->scanline_width,
-    this->scanline_delta,
-    this->original_inflated.size(),
-    this->original_deflated.size());
+    "interlaced:         %u\n",
+    in_path,
+    ihdr.width,
+    ihdr.height,
+    ihdr.color,
+    ihdr.depth,
+    ihdr.interlace);
 
+  std::cout << "scanline width:     " << scanline_width << "\nscanline delta:     " << scanline_delta << "\ninflated idat size: " << original_inflated.size() << "\ndeflated idat size" << original_deflated.size();
+  fprintf(stdout, "\nchunks present:     ");
   std::list<PngChunk>::iterator c_it;
 
   for (c_it = chunks.begin(); c_it != chunks.end(); ++c_it) {
@@ -689,7 +680,7 @@ void PngWolf::log_analysis() {
 
     // TODO: htonl is probably not right here
     for (it = invis_colors.begin(); it != invis_colors.end(); ++it) {
-      fprintf(stdout, "  - %08X # %u times\n", htonl(it->first), it->second);
+      fprintf(stdout, "  - %08X # %lu times\n", htonl(it->first), it->second);
       total += it->second;
     }
 

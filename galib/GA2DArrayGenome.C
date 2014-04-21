@@ -27,13 +27,13 @@ GA2DArrayGenome<T>::className() const {return "GA2DArrayGenome";}
 template <class T> int
 GA2DArrayGenome<T>::classID() const {return GAID::ArrayGenome2D;}
 
-template <class T> 
+template <class T>
 GA2DArrayGenome<T>::
-GA2DArrayGenome(unsigned int width, unsigned int height, 
+GA2DArrayGenome(unsigned int width, unsigned int height,
 		GAGenome::Evaluator f,
 		void * u) :
 GAArray<T>(width*height),
-GAGenome(DEFAULT_2DARRAY_INITIALIZER, 
+GAGenome(DEFAULT_2DARRAY_INITIALIZER,
 	 DEFAULT_2DARRAY_MUTATOR,
 	 DEFAULT_2DARRAY_COMPARATOR)
 {
@@ -44,7 +44,7 @@ GAGenome(DEFAULT_2DARRAY_INITIALIZER,
 }
 
 
-template <class T> 
+template <class T>
 GA2DArrayGenome<T>::
 GA2DArrayGenome(const GA2DArrayGenome<T> & orig) : GAArray<T>(orig.sz){
   GA2DArrayGenome<T>::copy(orig);
@@ -62,10 +62,10 @@ GA2DArrayGenome<T>::copy(const GAGenome & orig){
   if(c) {
     GAGenome::copy(*c);
     GAArray<T>::copy(*c);
-    nx = c->nx; ny = c->ny; 
-    minX = c->minX; minY = c->minY; 
+    nx = c->nx; ny = c->ny;
+    minX = c->minX; minY = c->minY;
     maxX = c->maxX; maxY = c->maxY;
-  } 
+  }
 }
 
 
@@ -77,8 +77,8 @@ GA2DArrayGenome<T>::clone(GAGenome::CloneMethod flag) const {
   }
   else{
     cpy->GAGenome::copy(*this);
-    cpy->minX = minX; cpy->minY = minY; 
-    cpy->maxX = maxX; cpy->maxY = maxY; 
+    cpy->minX = minX; cpy->minY = minY;
+    cpy->maxX = maxX; cpy->maxY = maxY;
   }
   return cpy;
 }
@@ -137,7 +137,7 @@ GA2DArrayGenome<T>::read(STD_ISTREAM &) {
 
 
 template <class T> int
-GA2DArrayGenome<T>::write(STD_OSTREAM & os) const 
+GA2DArrayGenome<T>::write(STD_OSTREAM & os) const
 {
   for(unsigned int j=0; j<ny; j++){
     for(unsigned int i=0; i<nx; i++){
@@ -167,7 +167,7 @@ GA2DArrayGenome<T>::resizeBehaviour(GAGenome::Dimension which) const {
 
 template <class T> int
 GA2DArrayGenome<T>::
-resizeBehaviour(GAGenome::Dimension which, 
+resizeBehaviour(GAGenome::Dimension which,
 		unsigned int lower, unsigned int upper)
 {
   if(upper < lower){
@@ -212,12 +212,12 @@ GA2DArrayGenome<T>::copy(const GA2DArrayGenome<T> & orig,
   for(unsigned int j=0; j<h; j++)
     GAArray<T>::copy(orig, (s+j)*nx+r, (y+j)*orig.nx+x, w);
 
-  _evaluated = gaFalse; 
+  _evaluated = gaFalse;
 }
 
 
 
-template <class T> int 
+template <class T> int
 GA2DArrayGenome<T>::equal(const GAGenome & c) const
 {
   if(this == &c) return 1;
@@ -259,9 +259,9 @@ GA2DArrayAlleleGenome<T>::className() const {return "GA2DArrayAlleleGenome";}
 template <class T> int
 GA2DArrayAlleleGenome<T>::classID() const {return GAID::ArrayAlleleGenome2D;}
 
-template <class T> 
+template <class T>
 GA2DArrayAlleleGenome<T>::
-GA2DArrayAlleleGenome(unsigned int width, unsigned int height, 
+GA2DArrayAlleleGenome(unsigned int width, unsigned int height,
 		      const GAAlleleSet<T> & s,
 		      GAGenome::Evaluator f, void * u) :
 GA2DArrayGenome<T>(width,height,f,u){
@@ -269,15 +269,15 @@ GA2DArrayGenome<T>(width,height,f,u){
   aset = new GAAlleleSet<T>[1];
   aset[0] = s;
 
-  initializer(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_INITIALIZER);
-  mutator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_MUTATOR);
-  comparator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_COMPARATOR);
-  crossover(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_CROSSOVER);
+  this->initializer(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_INITIALIZER);
+  this->mutator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_MUTATOR);
+  this->comparator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_COMPARATOR);
+  this->crossover(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_CROSSOVER);
 }
 
-template <class T> 
+template <class T>
 GA2DArrayAlleleGenome<T>::
-GA2DArrayAlleleGenome(unsigned int width, unsigned int height, 
+GA2DArrayAlleleGenome(unsigned int width, unsigned int height,
 		      const GAAlleleSetArray<T> & sa,
 		      GAGenome::Evaluator f, void * u) :
 GA2DArrayGenome<T>(width,height, f, u) {
@@ -286,16 +286,16 @@ GA2DArrayGenome<T>(width,height, f, u) {
   for(int i=0; i<naset; i++)
     aset[i] = sa.set(i);
 
-  initializer(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_INITIALIZER);
-  mutator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_MUTATOR);
-  comparator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_COMPARATOR);
-  crossover(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_CROSSOVER);
+  this->initializer(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_INITIALIZER);
+  this->mutator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_MUTATOR);
+  this->comparator(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_COMPARATOR);
+  this->crossover(GA2DArrayAlleleGenome<T>::DEFAULT_2DARRAY_ALLELE_CROSSOVER);
 }
 
 
-template <class T> 
+template <class T>
 GA2DArrayAlleleGenome<T>::
-GA2DArrayAlleleGenome(const GA2DArrayAlleleGenome<T> & orig) : 
+GA2DArrayAlleleGenome(const GA2DArrayAlleleGenome<T> & orig) :
 GA2DArrayGenome<T>(orig.nx, orig.ny) {
   naset = 0;
   aset = (GAAlleleSet<T>*)0;
@@ -315,10 +315,10 @@ GA2DArrayAlleleGenome<T>::clone(GAGenome::CloneMethod) const {
 }
 
 
-template <class T> void 
+template <class T> void
 GA2DArrayAlleleGenome<T>::copy(const GAGenome& orig){
   if(&orig == this) return;
-  const GA2DArrayAlleleGenome<T>* c = 
+  const GA2DArrayAlleleGenome<T>* c =
     DYN_CAST(const GA2DArrayAlleleGenome<T>*, &orig);
   if(c) {
     GA2DArrayGenome<T>::copy(*c);
@@ -386,19 +386,19 @@ GA2DArrayAlleleGenome<T>::equal(const GAGenome & c) const {
    Operator definitions
 ---------------------------------------------------------------------------- */
 // this does not handle genomes with multiple allele sets!
-template <class ARRAY_TYPE> void 
+template <class ARRAY_TYPE> void
 GA2DArrayAlleleGenome<ARRAY_TYPE>::UniformInitializer(GAGenome & c)
 {
   GA2DArrayAlleleGenome<ARRAY_TYPE> &child=
     DYN_CAST(GA2DArrayAlleleGenome<ARRAY_TYPE> &, c);
-  child.resize(GAGenome::ANY_SIZE,GAGenome::ANY_SIZE); 
+  child.resize(GAGenome::ANY_SIZE,GAGenome::ANY_SIZE);
   for(int i=child.width()-1; i>=0; i--)
     for(int j=child.height()-1; j>=0; j--)
       child.gene(i, j, child.alleleset().allele());
 }
 
 
-template <class ARRAY_TYPE> int 
+template <class ARRAY_TYPE> int
 GA2DArrayAlleleGenome<ARRAY_TYPE>::FlipMutator(GAGenome & c, float pmut)
 {
   GA2DArrayAlleleGenome<ARRAY_TYPE> &child=
@@ -430,7 +430,7 @@ GA2DArrayAlleleGenome<ARRAY_TYPE>::FlipMutator(GAGenome & c, float pmut)
 }
 
 
-template <class ARRAY_TYPE> int 
+template <class ARRAY_TYPE> int
 GA2DArrayGenome<ARRAY_TYPE>::SwapMutator(GAGenome & c, float pmut)
 {
   GA2DArrayGenome<ARRAY_TYPE> &child=DYN_CAST(GA2DArrayGenome<ARRAY_TYPE>&, c);
@@ -496,7 +496,7 @@ UniformCrossover(const GAGenome& p1, const GAGenome& p2,
   if(c1 && c2){
     GA2DArrayGenome<T> &sis=DYN_CAST(GA2DArrayGenome<T> &, *c1);
     GA2DArrayGenome<T> &bro=DYN_CAST(GA2DArrayGenome<T> &, *c2);
-    
+
     if(sis.width() == bro.width() && sis.height() == bro.height() &&
        mom.width() == dad.width() && mom.height() == dad.height() &&
        sis.width() == mom.width() && sis.height() == mom.height()){
@@ -567,7 +567,7 @@ UniformCrossover(const GAGenome& p1, const GAGenome& p2,
 
 
 // This crossover does clipping (no padding) for resizables.  Notice that this
-// means that any resizable children of two parents will have identical 
+// means that any resizable children of two parents will have identical
 // dimensions no matter what.
 template <class T> int
 GA2DArrayGenome<T>::
@@ -587,8 +587,8 @@ OnePointCrossover(const GAGenome& p1, const GAGenome& p2,
 
     if(sis.resizeBehaviour(GAGenome::WIDTH) == GAGenome::FIXED_SIZE &&
        bro.resizeBehaviour(GAGenome::WIDTH) == GAGenome::FIXED_SIZE){
-      if(mom.width() != dad.width() || 
-	 sis.width() != bro.width() || 
+      if(mom.width() != dad.width() ||
+	 sis.width() != bro.width() ||
 	 sis.width() != mom.width()){
 	GAErr(GA_LOC, mom.className(), "one-point cross", gaErrSameLengthReqd);
 	return nc;
@@ -612,8 +612,8 @@ OnePointCrossover(const GAGenome& p1, const GAGenome& p2,
 
     if(sis.resizeBehaviour(GAGenome::HEIGHT) == GAGenome::FIXED_SIZE &&
        bro.resizeBehaviour(GAGenome::HEIGHT) == GAGenome::FIXED_SIZE){
-      if(mom.height() != dad.height() || 
-	 sis.height() != bro.height() || 
+      if(mom.height() != dad.height() ||
+	 sis.height() != bro.height() ||
 	 sis.height() != mom.height()){
 	GAErr(GA_LOC, mom.className(), "one-point cross", gaErrSameLengthReqd);
 	return nc;
@@ -637,12 +637,12 @@ OnePointCrossover(const GAGenome& p1, const GAGenome& p2,
 
     sis.resize(sitex+lenx, sitey+leny);
     bro.resize(sitex+lenx, sitey+leny);
-    
+
     sis.copy(mom, 0, 0, momsitex-sitex, momsitey-sitey, sitex, sitey);
     sis.copy(dad, sitex, 0, dadsitex, dadsitey-sitey, lenx, sitey);
     sis.copy(dad, 0, sitey, dadsitex-sitex, dadsitey, sitex, leny);
     sis.copy(mom, sitex, sitey, momsitex, momsitey, lenx, leny);
-    
+
     bro.copy(dad, 0, 0, dadsitex-sitex, dadsitey-sitey, sitex, sitey);
     bro.copy(mom, sitex, 0, momsitex, momsitey-sitey, lenx, sitey);
     bro.copy(mom, 0, sitey, momsitex-sitex, momsitey, sitex, leny);
@@ -652,7 +652,7 @@ OnePointCrossover(const GAGenome& p1, const GAGenome& p2,
   }
   else if(c1){
     GA2DArrayGenome<T> &sis=DYN_CAST(GA2DArrayGenome<T> &, *c1);
-    
+
     if(sis.resizeBehaviour(GAGenome::WIDTH) == GAGenome::FIXED_SIZE){
       if(mom.width() != dad.width() || sis.width() != mom.width()){
 	GAErr(GA_LOC, mom.className(), "one-point cross", gaErrSameLengthReqd);
@@ -669,7 +669,7 @@ OnePointCrossover(const GAGenome& p1, const GAGenome& p2,
       sitex = GAMin(momsitex, dadsitex);
       lenx = GAMin(momlenx, dadlenx);
     }
-    
+
     if(sis.resizeBehaviour(GAGenome::HEIGHT) == GAGenome::FIXED_SIZE){
       if(mom.height() != dad.height() || sis.height() != mom.height()){
 	GAErr(GA_LOC, mom.className(), "one-point cross", gaErrSameLengthReqd);
@@ -686,9 +686,9 @@ OnePointCrossover(const GAGenome& p1, const GAGenome& p2,
       sitey = GAMin(momsitey, dadsitey);
       leny = GAMin(momleny, dadleny);
     }
-    
+
     sis.resize(sitex+lenx, sitey+leny);
-    
+
     if(GARandomBit()){
       sis.copy(mom, 0, 0, momsitex-sitex, momsitey-sitey, sitex, sitey);
       sis.copy(dad, sitex, 0, dadsitex, dadsitey-sitey, lenx, sitey);
@@ -759,7 +759,7 @@ EvenOddCrossover(const GAGenome& p1, const GAGenome& p2,
   }
   else if(c1){
     GA2DArrayGenome<T> &sis=DYN_CAST(GA2DArrayGenome<T> &, *c1);
-    
+
     if(mom.width() == dad.width() && mom.height() == dad.height() &&
        sis.width() == mom.width() && sis.height() == mom.height()){
       int count=0;

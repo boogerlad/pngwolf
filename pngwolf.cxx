@@ -622,7 +622,7 @@ void PngWolf::log_summary() {
       best_genomes.back()->score(),
       difftime(time(NULL), program_begun_at),
       genomes_evaluated);
-    std::cout << "size difference to original:  " << best_deflated.size() << '\n'
+    std::cout << "size difference to original:  " << best_deflated.size() << '\n';
   }
 
   if (diff >= 0)
@@ -638,7 +638,7 @@ void PngWolf::log_analysis() {
   fprintf(stdout, "---\n"
     "# %u x %u pixels at depth %u (mode %u) with IDAT ",
     ihdr.width, ihdr.height, ihdr.depth, ihdr.color);
-  std::cout << original_inflated.size() << " bytes (" << original_deflated.size() << " deflated)\n"
+  std::cout << original_inflated.size() << " bytes (" << original_deflated.size() << " deflated)\n";
 
   if (!verbose_analysis)
     return;
